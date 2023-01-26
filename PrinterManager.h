@@ -5,26 +5,31 @@
 //#include "deleterThread.h"
 #include "ofxXmlSettings.h"
 #include "ofxImGui.h"
+#include "ImageManager.h"
 
 
-
-enum CornerGrabb
-{
-	NOTHING,
-	TOP_LEFT,
-	TOP_RIGHT,
-	BOTTOM_LEFT,
-	BOTTOM_RIGHT
-};
+//enum CornerGrabb
+//{
+//	NOTHING,
+//	TOP_LEFT,
+//	TOP_RIGHT,
+//	BOTTOM_LEFT,
+//	BOTTOM_RIGHT
+//};
 
 class PrinterManager {
 public:
+
+	ImageManager myImageManager; //do zarz¹dzania imagem
+
+
+
 	void setup();
 	void update();
 	void draw();
 
 	void drawGui();
-	void drawRects();
+	//void drawRects();
 	void loadSettings();
 	void saveSettings();
 
@@ -65,10 +70,10 @@ protected:
 	std::string selectedPrinter = "";
 	int selectedPrinterMaxJobs = 4;
 
-	float m_initialWidth;
-	float m_initialHeight;
-	float m_width;
-	float m_height;
+	//float m_initialWidth;
+	//float m_initialHeight;
+	//float m_width;
+	//float m_height;
 
 	bool keepProportion16to9 = false;
 	bool keepProportion9to16 = false;

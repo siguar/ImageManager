@@ -1,6 +1,7 @@
 #include "PrinterManager.h"
 #include "printQ.h"
 #include "listenerThread.h"
+#include "ImageManager.h"
 
 //--------------------------------------------------------------
 void PrinterManager::setup() {
@@ -17,9 +18,11 @@ void PrinterManager::setup() {
 	//fbo.attachTexture(myImg.getTexture(), GL_RGBA, 0);
 	//fbo.allocate(fboSettings);
 
-	ofLoadImage(pixelsButtonSource, "y.png");				//obraz do skalowania
-	pixelsButtonID = gui.loadPixels(pixelsButtonSource); 
+	//ofLoadImage(pixelsButtonSource, "y.png");				//obraz do skalowania
+	//pixelsButtonID = gui.loadPixels(pixelsButtonSource); 
+
 	
+	myImageManager = ImageManager(img);
 
 	ofSetLogLevel(OF_LOG_VERBOSE);
 
@@ -62,13 +65,10 @@ void PrinterManager::update() {
 
 	previousUpdateFrequency = updateFrequency;
 	
-	if (bManualMode) {
-		topLeftGrabIndicator.setPosition(imagePosition.x, imagePosition.y);
-		//topLeftGrabIndicator.set(imagePosition.x - rectSize/2, imagePosition.y - rectSize/2, rectSize, rectSize);
-		topRightGrabIndicator.setPosition(imagePosition.x - topRightGrabIndicator.width + grabbedImageSize.x, imagePosition.y);
-		bottomLeftGrabIndicator.setPosition(imagePosition.x, imagePosition.y + grabbedImageSize.y - bottomLeftGrabIndicator.width);
-		bottomRightGrabIndicator.setPosition(imagePosition.x - bottomRightGrabIndicator.width + grabbedImageSize.x, imagePosition.y + grabbedImageSize.y - bottomRightGrabIndicator.width);
-	}
+
+	myImageManager.update();
+
+	
 //odrazu zrobic tu jak¹œ flage zeby te 4 badziewia sie wykonywaly tylko gdy uzytkownik tego potrzebuje
 	//rectangle maj¹ sie nie pojawiac tylko sie statycznie wlaczac gdy jest uruchomiony 
 }
@@ -78,11 +78,15 @@ void PrinterManager::draw() {
 	
 	drawGui();
 
-	img.draw(imagePosition, grabbedImageSize.x, grabbedImageSize.y);
+
+	myImageManager.draw();
+	
+
+	/*img.draw(imagePosition, grabbedImageSize.x, grabbedImageSize.y);
 
 	if (bManualMode) {
 		drawRects();
-	}
+	}*/
 
 
 
@@ -188,25 +192,30 @@ void PrinterManager::drawGui() {
 		printersSettings.setValue("settings:deleteJobsAutomatically", listenerObject.automaticJobDelete);
 		printersSettings.setValue("settings:updateFrequency", listenerObject.getUpdateFrequency());
 
-		printersSettings.setValue("settings:scallableImageSettings:sizeX", grabbedImageSize.x);
-		printersSettings.setValue("settings:scallableImageSettings:sizeY", grabbedImageSize.y);//ustawienia rozdzielczosci obrazu
-		printersSettings.setValue("settings:scallableImageSettings:posX", imagePosition.x);
-		printersSettings.setValue("settings:scallableImageSettings:posY", imagePosition.y);//ustawienia pozycji obrazu w oknie OF
+		//printersSettings.setValue("settings:scallableImageSettings:sizeX", grabbedImageSize.x);
+		//printersSettings.setValue("settings:scallableImageSettings:sizeY", grabbedImageSize.y);//ustawienia rozdzielczosci obrazu
+		//printersSettings.setValue("settings:scallableImageSettings:posX", imagePosition.x);
+		//printersSettings.setValue("settings:scallableImageSettings:posY", imagePosition.y);//ustawienia pozycji obrazu w oknie OF
+
+
 		printersSettings.saveFile("printersSettings.xml");
 	}
 
-	if (ImGui::Checkbox("Keep Proportion 16:9", &keepProportion16to9))
+
+
+
+	if (ImGui::Checkbox("Keep Proportion 16:9", &myImageManager.keepProportion16to9))
 	{
-		keepProportion9to16 = false;
+		myImageManager.keepProportion9to16 = false;
 	}
-	if (ImGui::Checkbox("Keep Proportion 9:16", &keepProportion9to16))
+	if (ImGui::Checkbox("Keep Proportion 9:16", &myImageManager.keepProportion9to16))
 	{
-		keepProportion16to9 = false;
+		myImageManager.keepProportion16to9 = false;
 	}
-	if (ImGui::Checkbox("Keep Proportion 3:2", &keepProportion9to16))
+	if (ImGui::Checkbox("Keep Proportion 3:2", &myImageManager.keepProportion9to16))
 	{
-		keepProportion9to16 = false;
-		keepProportion16to9 = false;
+		myImageManager.keepProportion9to16 = false;
+		myImageManager.keepProportion16to9 = false;
 	}
 
 	ImGui::BeginChild("EnterScale");
@@ -215,41 +224,42 @@ void PrinterManager::drawGui() {
 
 	if (ImGui::Button("ApplyScale"))
 	{
-		keepProportion16to9 = false;
-		keepProportion9to16 = false;
+		myImageManager.keepProportion16to9 = false;
+		myImageManager.keepProportion9to16 = false;
 
-		grabbedImageSize.x = scaleX;
-		grabbedImageSize.y = scaleY;
+		myImageManager.grabbedImageSize.x = scaleX;
+		myImageManager.grabbedImageSize.y = scaleY;
 	}
 	ImGui::EndChild();
 
-	ImGui::Checkbox("manual mode", &bManualMode);
+	ImGui::Checkbox("manual mode", &myImageManager.bManualMode);
 	ImGui::DragInt("rect size", &rectSize, 1, 1, 100);
 	if (ImGui::DragInt4("img pos & size", imagePosGui, 1, 1, 10000)) {
 	
-		imagePosition.x = imagePosGui[0];
-		imagePosition.y = imagePosGui[1];
-		grabbedImageSize.x = imagePosGui[2];
-		grabbedImageSize.y = imagePosGui[3];
+		myImageManager.imagePosition.x = imagePosGui[0];
+		myImageManager.imagePosition.y = imagePosGui[1];
+		myImageManager.grabbedImageSize.x = imagePosGui[2];
+		myImageManager.grabbedImageSize.y = imagePosGui[3];
 	}
 	if (ImGui::Button("center x")) {
 		// jaki jest rozmiar monitora/
 
-		imagePosition.x = (appSize.x/2 - grabbedImageSize.x/2);
-		imagePosGui[0] = imagePosition.x;
+		myImageManager.imagePosition.x = (appSize.x/2 - myImageManager.grabbedImageSize.x/2);
+		imagePosGui[0] = myImageManager.imagePosition.x;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("center y")) {
 
-		imagePosition.y = (appSize.y/ 2 - grabbedImageSize.y / 2);
-		imagePosGui[1] = imagePosition.y;
+		myImageManager.imagePosition.y = (appSize.y/ 2 - myImageManager.grabbedImageSize.y / 2);
+		imagePosGui[1] = myImageManager.imagePosition.y;
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("center all")) {
-		imagePosition.x = (appSize.x / 2 - grabbedImageSize.x / 2);
-		imagePosGui[0] = imagePosition.x;
-		imagePosition.y = (appSize.y / 2 - grabbedImageSize.y / 2);
-		imagePosGui[1] = imagePosition.y;
+		myImageManager.imagePosition.x = (appSize.x / 2 - myImageManager.grabbedImageSize.x / 2);
+		imagePosGui[0] = myImageManager.imagePosition.x;
+
+		imagePosition.y = (appSize.y / 2 - myImageManager.grabbedImageSize.y / 2);
+		imagePosGui[1] = myImageManager.imagePosition.y;
 	}
 	gui.end();
 }
@@ -267,28 +277,34 @@ void PrinterManager::drawGui() {
 
 */
 
-void PrinterManager::drawRects() {
-
-	
-	//if (overGrabPoint == TOP_LEFT)
-	//	ofDrawRectangle(topLeftGrabIndicator);
-	//else if (overGrabPoint == TOP_RIGHT)
-	//	ofDrawRectangle(topRightGrabIndicator);
-	//else if (overGrabPoint == BOTTOM_LEFT)
-	//	ofDrawRectangle(bottomLeftGrabIndicator);
-	//else if (overGrabPoint == BOTTOM_RIGHT)
-	//	ofDrawRectangle(bottomRightGrabIndicator);
-	ofSetColor(255, 0, 0);
-	ofNoFill();
-	ofDrawRectangle(topLeftGrabIndicator);
-	ofDrawRectangle(topRightGrabIndicator);
-	ofDrawRectangle(bottomLeftGrabIndicator);
-	ofDrawRectangle(bottomRightGrabIndicator);
-
-	ofDrawCircle(topLeftGrabIndicator.x, topLeftGrabIndicator.y, 50);
-
-	ofSetColor(255, 255, 255);
-}
+//void PrinterManager::drawRects() {
+//	myImageManager.drawRects();
+//
+//	
+//	//if (overGrabPoint == TOP_LEFT)
+//	//	ofDrawRectangle(topLeftGrabIndicator);
+//	//else if (overGrabPoint == TOP_RIGHT)
+//	//	ofDrawRectangle(topRightGrabIndicator);
+//	//else if (overGrabPoint == BOTTOM_LEFT)
+//	//	ofDrawRectangle(bottomLeftGrabIndicator);
+//	//else if (overGrabPoint == BOTTOM_RIGHT)
+//	//	ofDrawRectangle(bottomRightGrabIndicator);
+//
+//
+//
+//
+//
+//	/*ofSetColor(255, 0, 0);
+//	ofNoFill();
+//	ofDrawRectangle(topLeftGrabIndicator);
+//	ofDrawRectangle(topRightGrabIndicator);
+//	ofDrawRectangle(bottomLeftGrabIndicator);
+//	ofDrawRectangle(bottomRightGrabIndicator);
+//
+//	ofDrawCircle(topLeftGrabIndicator.x, topLeftGrabIndicator.y, 50);
+//
+//	ofSetColor(255, 255, 255);*/
+//}
 
 void PrinterManager::loadSettings() {
 	if (printersSettings.loadFile("printersSettings.xml")) {
@@ -300,7 +316,7 @@ void PrinterManager::loadSettings() {
 
 		listenerObject.setUpdateFrequency(printersSettings.getValue("settings:updateFrequency", 10000));
 
-		grabbedImageSize.x = printersSettings.getValue("settings:scallableImageSettings:sizeX", 680);
+		/*grabbedImageSize.x = printersSettings.getValue("settings:scallableImageSettings:sizeX", 680);
 		grabbedImageSize.y = printersSettings.getValue("settings:scallableImageSettings:sizeY", 680);
 		imagePosition.x = printersSettings.getValue("settings:scallableImageSettings:posX", 680);
 		imagePosition.y = printersSettings.getValue("settings:scallableImageSettings:posY", 680);
@@ -309,7 +325,7 @@ void PrinterManager::loadSettings() {
 		imagePosGui[0] = imagePosition.x;
 		imagePosGui[1] = imagePosition.y;
 		imagePosGui[2] = grabbedImageSize.x;
-		imagePosGui[3] = grabbedImageSize.y;
+		imagePosGui[3] = grabbedImageSize.y;*/
 		// imgX, imgY, imgW, imgH
 		
 
@@ -325,33 +341,38 @@ void PrinterManager::mouseReleased(const int& x, const int& y, const int& button
 }
 
 void PrinterManager::mousePressed(const int& x, const int& y, const int& button) {
-	startGrabPos = ofVec2f(x, y);
 
-	//=------------------------ funkcja inside
-	if (topLeftGrabIndicator.inside(x, y)) {
-		cornerGrabb = TOP_LEFT;
-		startGrabPos = ofVec2f(x, y);
-	}
-	else if (topRightGrabIndicator.inside(x, y)) {
-		cornerGrabb = TOP_RIGHT;
-		startGrabPos = ofVec2f(x, y);
-	}
-	else if (bottomLeftGrabIndicator.inside(x, y)) {
-		cornerGrabb = BOTTOM_LEFT;
-		startGrabPos = ofVec2f(x, y);
-	}
-	else if (bottomRightGrabIndicator.inside(x, y)) {
-		cornerGrabb = BOTTOM_RIGHT;
-		startGrabPos = ofVec2f(x, y);
-	}
-	else {
-		cornerGrabb = NOTHING;
-	}
+	myImageManager.mousePressed(x,y,button);
+
+	//startGrabPos = ofVec2f(x, y);
+
+	////=------------------------ funkcja inside
+	//if (topLeftGrabIndicator.inside(x, y)) {
+	//	cornerGrabb = TOP_LEFT;
+	//	startGrabPos = ofVec2f(x, y);
+	//}
+	//else if (topRightGrabIndicator.inside(x, y)) {
+	//	cornerGrabb = TOP_RIGHT;
+	//	startGrabPos = ofVec2f(x, y);
+	//}
+	//else if (bottomLeftGrabIndicator.inside(x, y)) {
+	//	cornerGrabb = BOTTOM_LEFT;
+	//	startGrabPos = ofVec2f(x, y);
+	//}
+	//else if (bottomRightGrabIndicator.inside(x, y)) {
+	//	cornerGrabb = BOTTOM_RIGHT;
+	//	startGrabPos = ofVec2f(x, y);
+	//}
+	//else {
+	//	cornerGrabb = NOTHING;
+	//}
 }
 
 void PrinterManager::mouseDragged(const int& x, const int& y, const int& button) {
 
-	switch (cornerGrabb)
+	myImageManager.mouseDragged(x, y, button);
+
+	/*switch (cornerGrabb)
 	{
 	case NOTHING:
 		{
@@ -438,11 +459,14 @@ void PrinterManager::mouseDragged(const int& x, const int& y, const int& button)
 	else if (keepProportion9to16)
 	{
 		grabbedImageSize.x = grabbedImageSize.y * 9 / 16;
-	}
+	}*/
 }
 
 void PrinterManager::mouseMoved(const int& x, const int& y) {
-	overGrabPoint = NOTHING;
+
+	myImageManager.mouseMoved(x, y);
+
+	/*overGrabPoint = NOTHING;
 
 	if (topLeftGrabIndicator.inside(x, y)) {
 		overGrabPoint = TOP_LEFT;
@@ -455,7 +479,7 @@ void PrinterManager::mouseMoved(const int& x, const int& y) {
 	}
 	else if (bottomRightGrabIndicator.inside(x, y)) {
 		overGrabPoint = BOTTOM_RIGHT;
-	}
+	}*/
 }
 
 
