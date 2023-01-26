@@ -7,10 +7,12 @@
 enum CornerGrabb
 {
 	NOTHING,
+	CENTRAL,
 	TOP_LEFT,
 	TOP_RIGHT,
 	BOTTOM_LEFT,
 	BOTTOM_RIGHT
+
 };
 
 
@@ -55,6 +57,7 @@ public:
 	ofRectangle topRightGrabIndicator = ofRectangle(0.0f, 0.0f, rectSize, rectSize);
 	ofRectangle bottomLeftGrabIndicator = ofRectangle(0.0f, 0.0f, rectSize, rectSize);
 	ofRectangle bottomRightGrabIndicator = ofRectangle(0.0f, 0.0f, rectSize, rectSize);
+	ofRectangle centralGrabIndicator = ofRectangle();
 
 	CornerGrabb cornerGrabb = NOTHING;
 	CornerGrabb overGrabPoint = NOTHING;

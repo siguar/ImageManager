@@ -6,6 +6,7 @@ void ofApp::setup(){
 	MyPrinterManager.setup();
 
 	MyPrinterManager.img.loadImage("x.png");
+	
 
 	
 	//MyPrinterManager.listenerObject.GetPrinters()[0].maxJobs

@@ -345,7 +345,7 @@ void PrinterManager::mousePressed(const int& x, const int& y, const int& button)
 	myImageManager.mousePressed(x,y,button);
 
 	//startGrabPos = ofVec2f(x, y);
-
+	
 	////=------------------------ funkcja inside
 	//if (topLeftGrabIndicator.inside(x, y)) {
 	//	cornerGrabb = TOP_LEFT;

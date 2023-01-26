@@ -38,7 +38,7 @@ void ImageManager::drawRects()
 	ofDrawRectangle(bottomLeftGrabIndicator);
 	ofDrawRectangle(bottomRightGrabIndicator);
 
-	ofDrawCircle(topLeftGrabIndicator.x, topLeftGrabIndicator.y, 50);
+	//ofDrawCircle(topLeftGrabIndicator.x, topLeftGrabIndicator.y, 50);
 
 	ofSetColor(255, 255, 255);
 }
@@ -48,115 +48,134 @@ void ImageManager::mouseReleased(const int& x, const int& y, const int& button)
 }
 void ImageManager::mousePressed(const int& x, const int& y, const int& button)
 {
+	startGrabPos = ofVec2f(x, y);
+	centralGrabIndicator = ofRectangle(imagePosition.x ,imagePosition.y, grabbedImageSize.x, grabbedImageSize.y);
+
 	if (topLeftGrabIndicator.inside(x, y)) {
 		cornerGrabb = TOP_LEFT;
-		startGrabPos = ofVec2f(x, y);
+		
 	}
 	else if (topRightGrabIndicator.inside(x, y)) {
 		cornerGrabb = TOP_RIGHT;
-		startGrabPos = ofVec2f(x, y);
+		
 	}
 	else if (bottomLeftGrabIndicator.inside(x, y)) {
 		cornerGrabb = BOTTOM_LEFT;
-		startGrabPos = ofVec2f(x, y);
+		
 	}
 	else if (bottomRightGrabIndicator.inside(x, y)) {
 		cornerGrabb = BOTTOM_RIGHT;
-		startGrabPos = ofVec2f(x, y);
+		
+	}
+	else if (centralGrabIndicator.inside(x, y)) {
+		cornerGrabb = CENTRAL;
+
+		
+
 	}
 	else {
 		cornerGrabb = NOTHING;
 	}
+	
 }
 void ImageManager::mouseDragged(const int& x, const int& y, const int& button)
 {
-	switch (cornerGrabb)
-	{
-	case NOTHING:
-	{
-		ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
-		imagePosition -= grabDistance;
-		startGrabPos -= grabDistance;
-	}
-	break;
-	case TOP_LEFT:
-	{
-		ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
-		grabbedImageSize += grabDistance;
-		startGrabPos -= grabDistance;
-
-		if (keepProportion16to9) {
-			imagePosition.x -= grabDistance.x;
-			imagePosition.y -= grabDistance.x * 9 / 16;
-		}
-		else if (keepProportion9to16)
+	if (bManualMode) {
+		switch (cornerGrabb)
 		{
-			imagePosition.x -= grabDistance.y * 9 / 16;
-			imagePosition.y -= grabDistance.y;
-		}
-		else {
-			imagePosition -= grabDistance;
-		}
-	}
-	break;
-	case TOP_RIGHT:
-	{
-		ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
-		grabbedImageSize.x -= grabDistance.x;
-		grabbedImageSize.y += grabDistance.y;
-		startGrabPos -= grabDistance;
-
-
-		if (keepProportion16to9) {
-			imagePosition.y += grabDistance.x * 9 / 16;
-		}
-		else if (keepProportion9to16)
+		case NOTHING:
 		{
-			imagePosition.y -= grabDistance.y;
-		}
-		else {
-			imagePosition.y -= grabDistance.y;
-		}
-	}
-	break;
-	case BOTTOM_LEFT:
-	{
 
-		ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
-		grabbedImageSize.x += grabDistance.x;
-		grabbedImageSize.y -= grabDistance.y;
-		startGrabPos -= grabDistance;
-
-
-		if (keepProportion9to16)
-		{
-			imagePosition.x += grabDistance.y * 9 / 16;
 		}
-		else
-		{
-			imagePosition.x -= grabDistance.x;
-		}
-	}
-	break;
-	case BOTTOM_RIGHT:
-	{
-		ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
-		grabbedImageSize -= grabDistance;
-		startGrabPos -= grabDistance;
-	}
-	break;
-	default:
-
 		break;
-	}
 
-	if (keepProportion16to9)
-	{
-		grabbedImageSize.y = grabbedImageSize.x * 9 / 16;
-	}
-	else if (keepProportion9to16)
-	{
-		grabbedImageSize.x = grabbedImageSize.y * 9 / 16;
+		case CENTRAL:
+		{
+			ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
+			imagePosition -= grabDistance;
+			startGrabPos -= grabDistance;
+		}
+		break;
+
+		case TOP_LEFT:
+		{
+			ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
+			grabbedImageSize += grabDistance;
+			startGrabPos -= grabDistance;
+
+			if (keepProportion16to9) {
+				imagePosition.x -= grabDistance.x;
+				imagePosition.y -= grabDistance.x * 9 / 16;
+			}
+			else if (keepProportion9to16)
+			{
+				imagePosition.x -= grabDistance.y * 9 / 16;
+				imagePosition.y -= grabDistance.y;
+			}
+			else {
+				imagePosition -= grabDistance;
+			}
+		}
+		break;
+		case TOP_RIGHT:
+		{
+			ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
+			grabbedImageSize.x -= grabDistance.x;
+			grabbedImageSize.y += grabDistance.y;
+			startGrabPos -= grabDistance;
+
+
+			if (keepProportion16to9) {
+				imagePosition.y += grabDistance.x * 9 / 16;
+			}
+			else if (keepProportion9to16)
+			{
+				imagePosition.y -= grabDistance.y;
+			}
+			else {
+				imagePosition.y -= grabDistance.y;
+			}
+		}
+		break;
+		case BOTTOM_LEFT:
+		{
+
+			ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
+			grabbedImageSize.x += grabDistance.x;
+			grabbedImageSize.y -= grabDistance.y;
+			startGrabPos -= grabDistance;
+
+
+			if (keepProportion9to16)
+			{
+				imagePosition.x += grabDistance.y * 9 / 16;
+			}
+			else
+			{
+				imagePosition.x -= grabDistance.x;
+			}
+		}
+		break;
+		case BOTTOM_RIGHT:
+		{
+			ofVec2f grabDistance = startGrabPos - ofVec2f(x, y);
+			grabbedImageSize -= grabDistance;
+			startGrabPos -= grabDistance;
+		}
+		break;
+		default:
+
+			break;
+		}
+
+		if (keepProportion16to9)
+		{
+			grabbedImageSize.y = grabbedImageSize.x * 9 / 16;
+		}
+		else if (keepProportion9to16)
+		{
+			grabbedImageSize.x = grabbedImageSize.y * 9 / 16;
+		}
 	}
 }
 void ImageManager::mouseMoved(const int& x, const int& y)
