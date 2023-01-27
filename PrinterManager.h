@@ -78,8 +78,7 @@ protected:
 	bool keepProportion16to9 = false;
 	bool keepProportion9to16 = false;
 
-	int scaleX = 680;
-	int scaleY = 470;
+	
 
 	ofFbo fbo;
 	ofImage myImg;
@@ -87,8 +86,8 @@ protected:
 	GLuint pixelsButtonID;
 
 	bool bManualMode = false;
-	int imagePosGui[4];
-	ofVec2f appSize = ofVec2f(1024, 768);
+	
+	
 	//Image scaling
 public:
 	ofImage img;

@@ -41,9 +41,10 @@ public:
 
 	void mouseDragged(const int& x, const int& y, const int& button);
 	void mouseMoved(const int& x, const int& y);
+	void drawGui();
 
-
-
+	void imageSettingsSaver();
+	void imageSettingsLoader();
 
 
 //===============================================================================================================
@@ -62,9 +63,16 @@ public:
 	CornerGrabb cornerGrabb = NOTHING;
 	CornerGrabb overGrabPoint = NOTHING;
 
-	
+	ofxXmlSettings imgSettingsSaver;
 
-	
+
 	bool bManualMode = false;
+
+	int scaleX = 680;
+	int scaleY = 470;
+
+	int imagePosGui[4];
+	std::string settingsID;
+	ofVec2f appSize = ofVec2f(1024, 768);
 };
 

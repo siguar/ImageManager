@@ -192,75 +192,77 @@ void PrinterManager::drawGui() {
 		printersSettings.setValue("settings:deleteJobsAutomatically", listenerObject.automaticJobDelete);
 		printersSettings.setValue("settings:updateFrequency", listenerObject.getUpdateFrequency());
 
-		//printersSettings.setValue("settings:scallableImageSettings:sizeX", grabbedImageSize.x);
-		//printersSettings.setValue("settings:scallableImageSettings:sizeY", grabbedImageSize.y);//ustawienia rozdzielczosci obrazu
-		//printersSettings.setValue("settings:scallableImageSettings:posX", imagePosition.x);
-		//printersSettings.setValue("settings:scallableImageSettings:posY", imagePosition.y);//ustawienia pozycji obrazu w oknie OF
 
+		myImageManager.imageSettingsSaver();
+		
 
 		printersSettings.saveFile("printersSettings.xml");
 	}
 
 
+	//ImGui::BeginChild("imageManagerGui");
 
+	//if (ImGui::Checkbox("Keep Proportion 16:9", &myImageManager.keepProportion16to9))
+	//{
+	//	myImageManager.keepProportion9to16 = false;
+	//}
+	//if (ImGui::Checkbox("Keep Proportion 9:16", &myImageManager.keepProportion9to16))
+	//{
+	//	myImageManager.keepProportion16to9 = false;
+	//}
+	//if (ImGui::Checkbox("Keep Proportion 3:2", &myImageManager.keepProportion9to16))
+	//{
+	//	myImageManager.keepProportion9to16 = false;
+	//	myImageManager.keepProportion16to9 = false;
+	//}
 
-	if (ImGui::Checkbox("Keep Proportion 16:9", &myImageManager.keepProportion16to9))
-	{
-		myImageManager.keepProportion9to16 = false;
-	}
-	if (ImGui::Checkbox("Keep Proportion 9:16", &myImageManager.keepProportion9to16))
-	{
-		myImageManager.keepProportion16to9 = false;
-	}
-	if (ImGui::Checkbox("Keep Proportion 3:2", &myImageManager.keepProportion9to16))
-	{
-		myImageManager.keepProportion9to16 = false;
-		myImageManager.keepProportion16to9 = false;
-	}
+	//ImGui::BeginChild("EnterScale");
+	//ImGui::InputInt("Scale X", &scaleX);
+	//ImGui::InputInt("Scale Y", &scaleY);
 
-	ImGui::BeginChild("EnterScale");
-	ImGui::InputInt("Scale X", &scaleX);
-	ImGui::InputInt("Scale Y", &scaleY);
+	//if (ImGui::Button("ApplyScale"))
+	//{
+	//	myImageManager.keepProportion16to9 = false;
+	//	myImageManager.keepProportion9to16 = false;
 
-	if (ImGui::Button("ApplyScale"))
-	{
-		myImageManager.keepProportion16to9 = false;
-		myImageManager.keepProportion9to16 = false;
+	//	myImageManager.grabbedImageSize.x = scaleX;
+	//	myImageManager.grabbedImageSize.y = scaleY;
+	//}
+	//ImGui::EndChild();
 
-		myImageManager.grabbedImageSize.x = scaleX;
-		myImageManager.grabbedImageSize.y = scaleY;
-	}
-	ImGui::EndChild();
+	//ImGui::Checkbox("manual mode", &myImageManager.bManualMode);
+	//ImGui::DragInt("rect size", &rectSize, 1, 1, 100);
+	//if (ImGui::DragInt4("img pos & size", imagePosGui, 1, 1, 10000)) {
+	//
+	//	myImageManager.imagePosition.x = imagePosGui[0];
+	//	myImageManager.imagePosition.y = imagePosGui[1];
+	//	myImageManager.grabbedImageSize.x = imagePosGui[2];
+	//	myImageManager.grabbedImageSize.y = imagePosGui[3];
+	//}
+	//if (ImGui::Button("center x")) {
+	//	// jaki jest rozmiar monitora/
 
-	ImGui::Checkbox("manual mode", &myImageManager.bManualMode);
-	ImGui::DragInt("rect size", &rectSize, 1, 1, 100);
-	if (ImGui::DragInt4("img pos & size", imagePosGui, 1, 1, 10000)) {
-	
-		myImageManager.imagePosition.x = imagePosGui[0];
-		myImageManager.imagePosition.y = imagePosGui[1];
-		myImageManager.grabbedImageSize.x = imagePosGui[2];
-		myImageManager.grabbedImageSize.y = imagePosGui[3];
-	}
-	if (ImGui::Button("center x")) {
-		// jaki jest rozmiar monitora/
+	//	myImageManager.imagePosition.x = (appSize.x/2 - myImageManager.grabbedImageSize.x/2);
+	//	imagePosGui[0] = myImageManager.imagePosition.x;
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("center y")) {
 
-		myImageManager.imagePosition.x = (appSize.x/2 - myImageManager.grabbedImageSize.x/2);
-		imagePosGui[0] = myImageManager.imagePosition.x;
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("center y")) {
+	//	myImageManager.imagePosition.y = (appSize.y/ 2 - myImageManager.grabbedImageSize.y / 2);
+	//	imagePosGui[1] = myImageManager.imagePosition.y;
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::Button("center all")) {
+	//	myImageManager.imagePosition.x = (appSize.x / 2 - myImageManager.grabbedImageSize.x / 2);
+	//	imagePosGui[0] = myImageManager.imagePosition.x;
 
-		myImageManager.imagePosition.y = (appSize.y/ 2 - myImageManager.grabbedImageSize.y / 2);
-		imagePosGui[1] = myImageManager.imagePosition.y;
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("center all")) {
-		myImageManager.imagePosition.x = (appSize.x / 2 - myImageManager.grabbedImageSize.x / 2);
-		imagePosGui[0] = myImageManager.imagePosition.x;
+	//	imagePosition.y = (appSize.y / 2 - myImageManager.grabbedImageSize.y / 2);
+	//	imagePosGui[1] = myImageManager.imagePosition.y;
+	//}
+	//ImGui::EndChild();
 
-		imagePosition.y = (appSize.y / 2 - myImageManager.grabbedImageSize.y / 2);
-		imagePosGui[1] = myImageManager.imagePosition.y;
-	}
+	myImageManager.drawGui();
+
 	gui.end();
 }
 
